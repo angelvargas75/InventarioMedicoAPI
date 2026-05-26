@@ -18,8 +18,21 @@ namespace InventarioMedicoAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearPedido(int productoId, int cantidad)
         {
-            var resultado = await _pedidoService.CrearPedidoAsync(productoId, cantidad);
-            return Ok(resultado);
+            try
+            {
+                if (productoId <= 0)
+                    return BadRequest(new { Mensaje = "El ID del producto debe ser mayor a 0" });
+
+                if (cantidad <= 0)
+                    return BadRequest(new { Mensaje = "La cantidad debe ser mayor a 0" });
+
+                var resultado = await _pedidoService.CrearPedidoAsync(productoId, cantidad);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Mensaje = "Error interno del servidor", Detalle = ex.Message });
+            }
         }
 
         // Concurrencia con Task.WhenAll
@@ -27,8 +40,15 @@ namespace InventarioMedicoAPI.Controllers
         [HttpGet("dashboard")]
         public async Task<IActionResult> ObtenerDashboard()
         {
-            var resultado = await _pedidoService.ObtenerDashboardAsync();
-            return Ok(resultado);
+            try
+            {
+                var resultado = await _pedidoService.ObtenerDashboardAsync();
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Mensaje = "Error interno del servidor", Detalle = ex.Message });
+            }
         }
     }
 }
